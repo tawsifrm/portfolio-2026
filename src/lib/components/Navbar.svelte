@@ -12,7 +12,6 @@
   }
 
   const navItems: NavItem[] = [
-    { label: 'Home', section: 'home' },
     { label: 'Experience', section: 'experience' },
     { label: 'Projects', section: 'projects' },
     { label: 'Contact', section: 'contact' },
