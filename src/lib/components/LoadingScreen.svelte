@@ -21,13 +21,13 @@
   aria-label="Loading portfolio"
 >
   <div
-    class="text-center"
-    in:scale={{ duration: 600, start: 0.8, opacity: 0 }}
+    class="text-center will-change-transform transform-gpu"
+    in:scale={{ duration: 500, start: 0.85, opacity: 0 }}
   >
     <!-- Glow effect behind the text -->
     <div class="relative">
       <div
-        class="absolute inset-0 blur-3xl opacity-30 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-blue-500 animate-pulse"
+        class="absolute inset-0 blur-[100px] opacity-30 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-blue-500 animate-pulse transform-gpu"
         aria-hidden="true"
       ></div>
       
@@ -51,7 +51,7 @@
 <style>
   /* Scoped bounce animation for loading dots */
   .loading-dot {
-    animation: loading-bounce 1s infinite;
+    animation: loading-bounce 0.8s infinite;
   }
 
   @keyframes loading-bounce {

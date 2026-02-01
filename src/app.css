@@ -288,3 +288,129 @@ a, button, input, textarea, select {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-purple-dark);
 }
+
+/* ===== GPU Acceleration for Animations ===== */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.transform-gpu-shadow {
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Duration utilities for refined timing */
+.duration-350 {
+  transition-duration: 350ms;
+}
+
+/* ===== Mobile-Specific Utilities and Optimizations ===== */
+
+/* Safe area insets for iOS */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Touch action utilities */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Mobile-specific animation performance */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile menu body lock utility */
+.mobile-menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Optimize glassmorphism for mobile (reduce blur for performance) */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .glass-nav {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* ===== Accessibility Utilities ===== */
+
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ===== Animated Background ===== */
+
+@keyframes pulseSlow {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(1.1); 
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+/* Accent color utilities for Tailwind v4 */
+.bg-accent-fuchsia\/10 {
+  background-color: rgba(232, 121, 249, 0.1);
+}
+
+.bg-accent-purple\/10 {
+  background-color: rgba(167, 139, 250, 0.1);
+}
+
+.bg-accent-blue\/10 {
+  background-color: rgba(96, 165, 250, 0.1);
+}
+
+.from-accent-fuchsia\/5 {
+  --tw-gradient-from: rgba(232, 121, 249, 0.05) var(--tw-gradient-from-position);
+}
+
+.to-accent-blue\/5 {
+  --tw-gradient-to: rgba(96, 165, 250, 0.05) var(--tw-gradient-to-position);
+}
+
+/* Focus styles for skip link */
+.focus\:bg-accent-fuchsia:focus {
+  background-color: var(--accent-fuchsia);
+}
+
+.focus\:shadow-glow-lg:focus {
+  box-shadow: 0 0 30px -5px var(--glow-fuchsia);
+}

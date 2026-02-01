@@ -1,14 +1,33 @@
 <script lang="ts">
-  // Experience Section - to be populated in the next phase
+  import { fly } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+  import { experiences } from '$lib/data/experiences';
+  import ExperienceCard from '$lib/components/ExperienceCard.svelte';
 </script>
 
-<section class="min-h-screen flex items-center justify-center p-6">
-  <div class="glass-card p-12 text-center animate-fade-in-scale">
-    <h1 class="text-4xl md:text-6xl font-display font-bold text-gradient mb-4">
-      Experience Section
-    </h1>
-    <p class="text-text-secondary text-lg">
-      This section will be populated by another engineer in the next phase.
-    </p>
+<section class="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-12">
+  <div class="max-w-7xl mx-auto w-full">
+    <!-- Section heading -->
+    <div class="text-center mb-8 md:mb-12">
+      <h2
+        class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gradient mb-3"
+        in:fly={{ y: 20, duration: 400, easing: quintOut }}
+      >
+        Experience
+      </h2>
+      <p
+        class="text-base sm:text-lg md:text-xl text-text-secondary"
+        in:fly={{ y: 20, delay: 100, duration: 400, easing: quintOut }}
+      >
+        Building impactful solutions across the stack
+      </p>
+    </div>
+
+    <!-- Experience cards grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+      {#each experiences as experience, index (`${experience.company}-${index}`)}
+        <ExperienceCard {experience} {index} />
+      {/each}
+    </div>
   </div>
 </section>
