@@ -200,6 +200,17 @@ a, button, input, textarea, select {
   }
 }
 
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -237,6 +248,10 @@ a, button, input, textarea, select {
 
 .animate-scale-in {
   animation: scaleIn 0.3s var(--ease-smooth) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.6s var(--ease-smooth) forwards;
 }
 
 .animate-shimmer {
