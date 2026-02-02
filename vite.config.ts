@@ -14,7 +14,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: false, // We use our own manifest.json in public folder
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,jpg,jpeg}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,jpg,jpeg,pdf}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

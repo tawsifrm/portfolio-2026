@@ -20,7 +20,7 @@
 
   const socialLinks: SocialLink[] = [
     { icon: Github, label: 'GitHub', href: 'https://github.com/tawsifrm', color: 'hover:text-white hover:bg-[#333]' },
-    { icon: Linkedin, label: 'LinkedIn', href: 'https://linkedin.com/in/tawsifrm', color: 'hover:text-white hover:bg-[#0077b5]' },
+    { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/tawsif-mayaz-446a4b211/', color: 'hover:text-white hover:bg-[#0077b5]' },
     { icon: Mail, label: 'Email', href: 'mailto:tawsif.mayaz@uwaterloo.ca', color: 'hover:text-white hover:bg-accent-fuchsia' },
     { icon: FileText, label: 'Resume', href: '/Resume-public/Tawsif_Resume.pdf', color: 'hover:text-white hover:bg-accent-purple' },
   ];
