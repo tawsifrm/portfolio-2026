@@ -24,7 +24,8 @@
     hovering: false,
     startTime: 0,
     pausedAt: 0,
-    rafId: 0
+    rafId: 0,
+    animationRafId: 0
   });
 
   let opts = {
@@ -171,13 +172,20 @@
   }
 
   function goTo(i: number, animate = true) {
-    const start = state.pos || state.index;
+    // Cancel any ongoing animation
+    if (state.animationRafId) {
+      cancelAnimationFrame(state.animationRafId);
+      state.animationRafId = 0;
+    }
+    
+    const start = state.pos;
     const end = nearest(start, i);
     const dur = animate ? opts.transitionMs : 0;
     const t0 = performance.now();
     const ease = (x: number) => 1 - Math.pow(1 - x, 4);
     
     state.animating = true;
+    state.index = mod(i, n); // Update index immediately for instant dot update
     
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / dur);
@@ -185,12 +193,13 @@
       state.pos = start + (end - start) * p;
       render();
       if (t < 1) {
-        requestAnimationFrame(step);
+        state.animationRafId = requestAnimationFrame(step);
       } else {
+        state.animationRafId = 0;
         afterSnap(i);
       }
     };
-    requestAnimationFrame(step);
+    state.animationRafId = requestAnimationFrame(step);
   }
 
   function afterSnap(i: number) {
@@ -327,6 +336,10 @@
     
     if (state.rafId) {
       cancelAnimationFrame(state.rafId);
+    }
+    
+    if (state.animationRafId) {
+      cancelAnimationFrame(state.animationRafId);
     }
     
     if (ro) {

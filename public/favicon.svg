@@ -1,0 +1,31 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e879f9;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a78bfa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded rectangle background -->
+  <rect width="64" height="64" rx="12" fill="url(#bgGradient)"/>
+  
+  <!-- Border glow -->
+  <rect width="64" height="64" rx="12" fill="none" stroke="url(#textGradient)" stroke-width="1" opacity="0.3"/>
+  
+  <!-- TM Text -->
+  <text 
+    x="32" 
+    y="44" 
+    font-family="Space Grotesk, system-ui, sans-serif" 
+    font-size="28" 
+    font-weight="700" 
+    fill="url(#textGradient)" 
+    text-anchor="middle"
+  >TM</text>
+</svg>

@@ -5,6 +5,7 @@
   import { quintOut } from 'svelte/easing';
   import { Menu, X } from 'lucide-svelte';
   import { preloadSection } from '../utils/preload';
+  import { onMount } from 'svelte';
 
   interface NavItem {
     label: string;
@@ -18,6 +19,7 @@
   ];
 
   let mobileMenuOpen = $state(false);
+  let scrolled = $state(false);
 
   function handleNavClick(section: Section) {
     navigateToSection(section);
@@ -52,11 +54,22 @@
   function handleNavHover(section: Section) {
     preloadSection(section);
   }
+
+  function handleScroll() {
+    scrolled = window.scrollY > 20;
+  }
+
+  onMount(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
-<nav class="fixed top-0 left-0 right-0 z-50 glass-nav" aria-label="Main navigation">
+<nav class="sticky top-0 left-0 right-0 z-50 glass-nav" class:scrolled aria-label="Main navigation">
   <div class="container mx-auto px-4 sm:px-6 py-4">
     <div class="flex items-center justify-between">
       <!-- Logo/Brand -->
@@ -68,33 +81,34 @@
         TM
       </button>
 
-      <!-- Desktop Navigation Items -->
-      <div class="hidden md:flex items-center gap-2">
-        {#each navItems as item}
-          {#if $activeSection === item.section}
-            <Button
-              variant="ghost"
-              size="sm"
-              onclick={() => handleNavClick(item.section)}
+      <!-- Desktop Navigation Items with Animated Indicator -->
+      <div class="hidden md:block">
+        <div class="nav-container">
+          {#each navItems as item, index}
+            <a
+              href="#{item.section}"
+              class="nav-link"
+              class:active={$activeSection === item.section}
+              data-index={index}
+              onclick={(e) => {
+                e.preventDefault();
+                handleNavClick(item.section);
+              }}
               onmouseenter={() => handleNavHover(item.section)}
+              role="button"
+              tabindex="0"
+              onkeydown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleNavClick(item.section);
+                }
+              }}
             >
-              <span class="text-accent-fuchsia border-b-[3px] border-accent-fuchsia pb-0.5 animate-pulse-glow">
-                {item.label}
-              </span>
-            </Button>
-          {:else}
-            <Button
-              variant="ghost"
-              size="sm"
-              onclick={() => handleNavClick(item.section)}
-              onmouseenter={() => handleNavHover(item.section)}
-            >
-              <span class="hover:underline decoration-accent-fuchsia/50 underline-offset-4 hover:scale-105 transition-all duration-200">
-                {item.label}
-              </span>
-            </Button>
-          {/if}
-        {/each}
+              {item.label}
+            </a>
+          {/each}
+          <div id="nav-indicator"></div>
+        </div>
       </div>
 
       <!-- Mobile Hamburger Button -->
@@ -164,3 +178,132 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .nav-container {
+    position: relative;
+    display: flex;
+    gap: 0;
+  }
+
+  .nav-link {
+    position: relative;
+    padding: 10px 20px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .nav-link.active {
+    color: var(--text-primary);
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+
+  /* Animated particles on hover */
+  .nav-link::before,
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+  }
+
+  .nav-link::before {
+    top: 0;
+    left: 10px;
+    width: 6px;
+    height: 6px;
+  }
+
+  .nav-link::after {
+    top: 5px;
+    left: 18px;
+    width: 4px;
+    height: 4px;
+  }
+
+  /* Experience - Fuchsia/Purple particles */
+  .nav-link[data-index="0"]::before {
+    background-color: var(--accent-fuchsia);
+  }
+
+  .nav-link[data-index="0"]::after {
+    background-color: var(--accent-purple);
+  }
+
+  /* Projects - Purple/Blue particles */
+  .nav-link[data-index="1"]::before {
+    background-color: var(--accent-purple);
+  }
+
+  .nav-link[data-index="1"]::after {
+    background-color: var(--accent-blue);
+  }
+
+  /* Contact - Blue/Fuchsia particles */
+  .nav-link[data-index="2"]::before {
+    background-color: var(--accent-blue);
+  }
+
+  .nav-link[data-index="2"]::after {
+    background-color: var(--accent-fuchsia);
+  }
+
+  .nav-link:hover::before,
+  .nav-link:hover::after {
+    transform: scale(1);
+  }
+
+  /* Animated indicator bar */
+  #nav-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    width: 30px;
+    height: 3px;
+    background: linear-gradient(130deg, var(--accent-fuchsia), var(--accent-purple));
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* Experience hover/active */
+  .nav-link[data-index="0"]:hover ~ #nav-indicator,
+  .nav-link[data-index="0"].active ~ #nav-indicator {
+    left: 5%;
+    background: linear-gradient(130deg, var(--accent-fuchsia), var(--accent-purple));
+    opacity: 1;
+  }
+
+  /* Projects hover/active */
+  .nav-link[data-index="1"]:hover ~ #nav-indicator,
+  .nav-link[data-index="1"].active ~ #nav-indicator {
+    left: 37%;
+    background: linear-gradient(130deg, var(--accent-purple), var(--accent-blue));
+    opacity: 1;
+  }
+
+  /* Contact hover/active */
+  .nav-link[data-index="2"]:hover ~ #nav-indicator,
+  .nav-link[data-index="2"].active ~ #nav-indicator {
+    left: 72%;
+    background: linear-gradient(130deg, var(--accent-blue), var(--accent-fuchsia));
+    opacity: 1;
+  }
+
+  /* Add glow effect when hovering */
+  .nav-link:hover {
+    filter: drop-shadow(0 0 8px rgba(232, 121, 249, 0.3));
+  }
+</style>
