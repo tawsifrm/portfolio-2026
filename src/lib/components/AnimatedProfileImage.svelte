@@ -9,10 +9,10 @@
   }
 
   let { 
-    src = '/images/new pfp.jpeg',
-    srcSm = '',
-    srcMd = '',
-    srcLg = '',
+    src = '/images/new-pfp-lg.webp',
+    srcSm = '/images/new-pfp-sm.webp',
+    srcMd = '/images/new-pfp-md.webp',
+    srcLg = '/images/new-pfp-lg.webp',
     alt = 'Tawsif Mayaz - Computer Engineering Student',
     class: className = ''
   }: Props = $props();

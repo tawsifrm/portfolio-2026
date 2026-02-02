@@ -7,7 +7,7 @@
     <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
       <p class="text-text-muted text-xs sm:text-sm">
         <span class="hover:text-accent-fuchsia transition-colors duration-200 cursor-default">
-          © 2026 Tawsif Mayaz. All rights reserved.
+          Made with ❤️ by Tawsif
         </span>
       </p>
     </div>
