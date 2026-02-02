@@ -1,4 +1,5 @@
 // Component barrel exports
+export { default as AnimatedProfileImage } from './AnimatedProfileImage.svelte';
 export { default as Button } from './Button.svelte';
 export { default as ExperienceCard } from './ExperienceCard.svelte';
 export { default as Footer } from './Footer.svelte';
