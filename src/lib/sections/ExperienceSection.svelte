@@ -5,7 +5,7 @@
   import ExperienceCard from '$lib/components/ExperienceCard.svelte';
 </script>
 
-<section class="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-12">
+<section class="px-4 sm:px-6 md:px-12 py-8 sm:py-12 md:py-16">
   <div class="max-w-7xl mx-auto w-full">
     <!-- Section heading -->
     <div class="text-center mb-8 md:mb-12">

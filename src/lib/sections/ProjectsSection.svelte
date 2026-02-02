@@ -32,7 +32,7 @@
 
 <svelte:window bind:innerWidth={windowWidth} />
 
-<section class="min-h-screen flex flex-col justify-center py-8 sm:py-12 md:py-16">
+<section class="py-8 sm:py-12 md:py-16">
   <!-- Section heading -->
   <div class="text-center mb-0 md:mb-2 px-4">
     <h2

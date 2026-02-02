@@ -42,22 +42,9 @@
       </span>
 
       <!-- Description -->
-      <p class="text-sm sm:text-base text-text-secondary mb-4 line-clamp-3">
+      <p class="text-sm sm:text-base text-text-secondary mb-4">
         {experience.detail}
       </p>
-
-      <!-- Key Achievements -->
-      <div class="mb-4">
-        <h5 class="text-sm font-medium text-accent-blue-light mb-2">Key Achievements</h5>
-        <ul class="space-y-1.5">
-          {#each experience.achievements as achievement}
-            <li class="flex items-start text-xs sm:text-sm text-text-muted">
-              <span class="mr-2 text-accent-blue flex-shrink-0">•</span>
-              <span>{achievement}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
 
       <!-- Tech stack -->
       <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-auto pt-2">

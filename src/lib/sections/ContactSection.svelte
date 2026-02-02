@@ -5,7 +5,7 @@
   import { Button } from '../components';
 </script>
 
-<section class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+<section class="px-4 sm:px-6 py-8 sm:py-12 md:py-16">
   <div class="max-w-3xl mx-auto w-full">
     <div class="glass-card p-6 sm:p-8 md:p-12 space-y-8 sm:space-y-10">
       <!-- Heading -->

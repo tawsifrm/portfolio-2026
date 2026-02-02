@@ -36,7 +36,7 @@
   }
 </script>
 
-<section class="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 xl:px-24 py-4 sm:py-6 lg:py-8 relative w-full">
+<section class="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 xl:px-24 py-4 relative w-full">
   <div class="max-w-7xl mx-auto w-full">
     <!-- Main Content Grid: Text Left, Image Right -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">

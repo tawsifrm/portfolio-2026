@@ -23,8 +23,8 @@
   };
 </script>
 
-<main id="main-content" aria-label="Main content" class="pt-16 md:pt-20 min-h-screen flex flex-col">
-  <div class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pb-8 md:pb-12">
+<main id="main-content" aria-label="Main content" class="min-h-screen flex flex-col">
+  <div class="flex-grow pb-8 md:pb-12">
     {#key $activeSection}
       <div
         class="transform-gpu"
