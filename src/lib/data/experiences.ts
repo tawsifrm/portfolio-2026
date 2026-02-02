@@ -9,6 +9,14 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     title: "Software Developer Intern",
+    company: "Empire Life Insurance Company",
+    stack: ["GCP", "Kubernetes", "Terraform", "SQLAlchemy", "Docker", "Helm", "Argo CD"],
+    detail:
+      "Developing a scalable ETL platform for automated provider data processing with resilient, containerized workflows and ensured data integrity across critical billing records.",
+    date: "Jan 2026 - Present"
+  },
+  {
+    title: "Software Developer Intern",
     company: "Cineplex Digital Media",
     stack: ["Unity", "C#", "React", "Flask", "Python", "D3.js", "Three.js", "SQLite"],
     detail:

@@ -229,6 +229,11 @@
 
   function onDragStart(e: PointerEvent) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    
+    // Don't start drag if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('a, button')) return;
+    
     e.preventDefault();
     state.dragging = true;
     state.pointerId = e.pointerId;
@@ -667,6 +672,7 @@
     flex-direction: row;
     gap: 8px;
     flex-shrink: 0;
+    pointer-events: auto;
   }
 
   .mzaBtn {

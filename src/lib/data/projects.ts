@@ -9,6 +9,14 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "Rosetta",
+    stack: ["React", "FastAPI", "PostgreSQL", "RAG"],
+    date: "Jan 2026",
+    detail: "3rd place at HackHive - live lecture translation platform with RAG pipeline and real-time contextual citations.",
+    link: "https://devpost.com/software/rosetta-hq6aby?_gl=1*igx6fd*_gcl_au*MTkyMzcwMjg4OC4xNzY4NDQyNDgx*_ga*MTE1OTIyNDQxMS4xNzY5MDQ4NjIy*_ga_0YHJK3Y10M*czE3Njk5OTkzOTkkbzI0JGcxJHQxNzY5OTk5NDA2JGo1MyRsMCRoMA..",
+    github: "https://github.com/AbeerDas/Rosetta-HackHive"
+  },
+  {
     title: "BetterKaraoke",
     stack: ["React Native", "Expo", "Expo AV"],
     date: "Aug 2025",
