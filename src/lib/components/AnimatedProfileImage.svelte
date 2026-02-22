@@ -137,18 +137,18 @@
     filter: brightness(1.05) contrast(1.02);
   }
 
-  /* Responsive adjustments */
+  /* Responsive adjustments - increase letter-spacing to compensate for smaller font */
   @media (max-width: 768px) {
     .text-content {
       font-size: 8px;
-      letter-spacing: 1px;
+      letter-spacing: 1.8px;
     }
   }
 
   @media (max-width: 480px) {
     .text-content {
       font-size: 7px;
-      letter-spacing: 0.8px;
+      letter-spacing: 2.5px;
     }
   }
 </style>
