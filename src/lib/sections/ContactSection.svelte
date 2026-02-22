@@ -60,7 +60,7 @@
 
         <!-- LinkedIn Button -->
         <a
-          href="https://www.linkedin.com/in/tawsif-mayaz-446a4b211/"
+          href="https://www.linkedin.com/in/tawsif-mayaz/"
           target="_blank"
           rel="noopener noreferrer"
           class="glass-card p-8 sm:p-6 flex flex-col items-center gap-3 text-center transition-all duration-200 md:hover:border-accent-fuchsia/30 md:hover:shadow-glow-md md:hover:scale-[1.03] md:hover:rotate-1 group will-change-transform touch-manipulation"
