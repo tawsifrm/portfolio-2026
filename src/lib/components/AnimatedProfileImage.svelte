@@ -114,9 +114,15 @@
 
   .text-content {
     font-family: 'Space Grotesk', system-ui, sans-serif;
+    /* Sized so a single copy of the label is just under the path's total
+       length (~520 user units), so the two tiled copies scroll seamlessly
+       without overlapping. The SVG scales, so this holds at every screen
+       size — do NOT reintroduce per-breakpoint font-size/letter-spacing
+       overrides, which change the text length and cause the copies to
+       overlap (was the mobile bug). */
     font-size: 8.5px;
     font-weight: 700;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.1px;
     text-transform: uppercase;
     fill: var(--accent-fuchsia, #e879f9);
     mix-blend-mode: normal;
@@ -135,20 +141,5 @@
 
   .animated-profile-svg:hover .profile-image {
     filter: brightness(1.05) contrast(1.02);
-  }
-
-  /* Responsive adjustments - increase letter-spacing to compensate for smaller font */
-  @media (max-width: 768px) {
-    .text-content {
-      font-size: 8px;
-      letter-spacing: 1.8px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .text-content {
-      font-size: 7px;
-      letter-spacing: 2.5px;
-    }
   }
 </style>

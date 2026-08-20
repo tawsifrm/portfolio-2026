@@ -2,7 +2,7 @@
   import { fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { Github, ExternalLink } from 'lucide-svelte';
-  import type { Project } from '$lib/data/projects';
+  import { coverGradient, type Project } from '$lib/data/projects';
 
   interface Props {
     project: Project;
@@ -10,88 +10,95 @@
   }
 
   let { project, index }: Props = $props();
+
+  const grad = $derived(coverGradient(index));
+  // Layer the screenshot over the gradient so a missing/late image degrades
+  // gracefully to the on-brand gradient instead of a blank cover.
+  const cover = $derived(project.image ? `url('${project.image}'), ${grad}` : grad);
+  // Only show a separate "live" link when it differs from the repo.
+  const hasLiveLink = $derived(!!project.link && project.link !== project.github);
 </script>
 
 <div
-  class="relative group"
+  class="relative group h-full"
   in:fly={{ y: 30, delay: index * 80, duration: 500, easing: quintOut }}
 >
-  <div
-    class="glass-card relative overflow-hidden p-4 sm:p-5 md:p-6 h-full flex flex-col transition-all duration-200 ease-smooth md:hover:border-accent-fuchsia/30 md:hover:shadow-glow-md md:hover:scale-[1.02] md:hover:-translate-y-1 transform-gpu will-change-transform"
+  <article
+    class="glass-card relative overflow-hidden h-full flex flex-col transition-all duration-200 ease-smooth md:hover:border-accent-fuchsia/30 md:hover:shadow-glow-md md:hover:-translate-y-1 transform-gpu will-change-transform"
   >
-    <!-- Gradient overlay on hover -->
+    <!-- Cover -->
     <div
-      class="absolute inset-0 bg-gradient-to-br from-accent-fuchsia/5 to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-350 pointer-events-none"
-    ></div>
-
-    <div class="relative z-10 flex flex-col h-full">
-      <!-- Header with title and links -->
-      <div class="flex justify-between items-start mb-4">
-        <h3
-          class="text-lg sm:text-xl font-bold text-accent-fuchsia md:group-hover:text-accent-fuchsia-light transition-colors duration-250"
-        >
-          {project.title}
-        </h3>
-        <div class="flex space-x-1 sm:space-x-3">
-          {#if project.github}
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="p-2 text-gray-400 hover:text-accent-fuchsia md:hover:scale-110 md:hover:rotate-12 transition-all duration-200 touch-manipulation"
-              aria-label="GitHub Repository"
-            >
-              <Github class="w-6 h-6 sm:w-5 sm:h-5" />
-            </a>
-          {/if}
-          {#if project.link}
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="p-2 text-gray-400 hover:text-accent-fuchsia md:hover:scale-110 md:hover:rotate-12 transition-all duration-200 touch-manipulation"
-              aria-label="View Project"
-            >
-              <ExternalLink class="w-6 h-6 sm:w-5 sm:h-5" />
-            </a>
-          {/if}
-        </div>
-      </div>
-
-      <!-- Date badge -->
+      class="relative aspect-[16/9] w-full overflow-hidden"
+      style="background-image: {cover}; background-size: cover; background-position: center;"
+    >
+      <div class="cover-pattern absolute inset-0" aria-hidden="true"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
       <span
-        class="inline-block px-3 py-1 text-xs sm:text-sm font-medium text-accent-fuchsia bg-accent-fuchsia/10 rounded-full mb-4 w-fit"
+        class="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium text-white/90 bg-black/40 backdrop-blur-sm rounded-full border border-white/10"
       >
         {project.date}
       </span>
+      <h3
+        class="absolute left-4 right-4 bottom-3 text-xl sm:text-2xl font-display font-bold text-white leading-tight"
+        style="text-shadow: 0 2px 12px rgba(0,0,0,0.6);"
+      >
+        {project.title}
+      </h3>
+    </div>
 
-      <!-- Description -->
-      <p class="text-sm sm:text-base text-text-secondary mb-4 line-clamp-3 flex-grow">
-        {project.detail}
-      </p>
+    <!-- Body -->
+    <div class="relative z-10 flex flex-col flex-grow p-4 sm:p-5">
+      <p class="text-sm text-text-secondary mb-4 line-clamp-3">{project.detail}</p>
 
-      <!-- Tech stack -->
-      <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-auto pt-2">
+      <div class="flex flex-wrap gap-1.5 mb-4">
         {#each project.stack.slice(0, 4) as tech}
           <span
-            class="px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-mono text-accent-fuchsia-light bg-white/5 rounded-full border border-white/5"
+            class="px-2 py-0.5 text-xs font-mono text-accent-fuchsia-light bg-white/5 rounded-full border border-white/5"
           >
             {tech}
           </span>
         {/each}
         {#if project.stack.length > 4}
-          <span
-            class="px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-mono text-gray-400 bg-white/5 rounded-full"
-          >
-            +{project.stack.length - 4} more
+          <span class="px-2 py-0.5 text-xs font-mono text-text-muted bg-white/5 rounded-full">
+            +{project.stack.length - 4}
           </span>
         {/if}
       </div>
-    </div>
 
-    <!-- Animated border bottom -->
-    <div
-      class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-accent-fuchsia to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-250 pointer-events-none"
-    ></div>
-  </div>
+      <div class="flex items-center gap-2 mt-auto pt-1">
+        {#if hasLiveLink}
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg text-bg-primary bg-gradient-to-r from-accent-fuchsia to-accent-purple md:hover:shadow-glow-sm active:scale-95 transition-all duration-200 touch-manipulation"
+            aria-label="View live project {project.title}"
+          >
+            <ExternalLink class="w-4 h-4" />
+            View
+          </a>
+        {/if}
+        {#if project.github}
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-text-secondary bg-white/5 border border-white/10 md:hover:text-accent-fuchsia md:hover:border-accent-fuchsia/30 active:scale-95 transition-all duration-200 touch-manipulation"
+            aria-label="GitHub repository for {project.title}"
+          >
+            <Github class="w-4 h-4" />
+            Code
+          </a>
+        {/if}
+      </div>
+    </div>
+  </article>
 </div>
+
+<style>
+  .cover-pattern {
+    background-image:
+      radial-gradient(circle at 18% 82%, rgba(232, 121, 249, 0.28) 0%, transparent 45%),
+      radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.22) 0%, transparent 45%);
+  }
+</style>

@@ -3,6 +3,63 @@
 /* ===== Font Imports ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+/* ===== Design Tokens (Tailwind v4) =====
+   Defined here so Tailwind generates utilities like `text-accent-fuchsia`,
+   `bg-bg-primary`, `shadow-glow-md`, `font-display`. This is the single source
+   of truth for the palette — there is no active tailwind.config.js (v4 is
+   CSS-first and does not load it). Keep the plain `:root` vars below in sync;
+   they are referenced by name in hand-written classes and component <style>. */
+@theme {
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Background layers */
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #131318;
+  --color-bg-tertiary: #1a1a24;
+
+  /* Accent — fuchsia */
+  --color-accent-fuchsia: #e879f9;
+  --color-accent-fuchsia-light: #f0abfc;
+  --color-accent-fuchsia-dark: #a855f7;
+
+  /* Accent — purple */
+  --color-accent-purple: #a78bfa;
+  --color-accent-purple-light: #c4b5fd;
+  --color-accent-purple-dark: #7c3aed;
+
+  /* Accent — blue */
+  --color-accent-blue: #60a5fa;
+  --color-accent-blue-light: #93c5fd;
+  --color-accent-blue-dark: #3b82f6;
+
+  /* Text */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #64748b;
+
+  /* Borders / surfaces */
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-border-subtle: #27272a;
+  --color-surface-glass: rgba(26, 26, 36, 0.7);
+
+  /* Glow shadows */
+  --shadow-glow-sm: 0 0 15px -3px rgba(232, 121, 249, 0.3);
+  --shadow-glow-md: 0 0 25px -5px rgba(232, 121, 249, 0.4);
+  --shadow-glow-lg: 0 0 35px -5px rgba(232, 121, 249, 0.5);
+  --shadow-glow-purple-sm: 0 0 15px -3px rgba(167, 139, 250, 0.3);
+  --shadow-glow-purple-md: 0 0 25px -5px rgba(167, 139, 250, 0.4);
+  --shadow-glow-purple-lg: 0 0 35px -5px rgba(167, 139, 250, 0.5);
+  --shadow-glow-blue-sm: 0 0 15px -3px rgba(96, 165, 250, 0.3);
+  --shadow-glow-blue-md: 0 0 25px -5px rgba(96, 165, 250, 0.4);
+  --shadow-glow-blue-lg: 0 0 35px -5px rgba(96, 165, 250, 0.5);
+
+  /* Easing */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
 /* ===== CSS Custom Properties ===== */
 :root {
   /* Transition Timings */
@@ -391,34 +448,4 @@ a, button, input, textarea, select {
 
 .animate-pulse-slow {
   animation: pulseSlow 8s ease-in-out infinite;
-}
-
-/* Accent color utilities for Tailwind v4 */
-.bg-accent-fuchsia\/10 {
-  background-color: rgba(232, 121, 249, 0.1);
-}
-
-.bg-accent-purple\/10 {
-  background-color: rgba(167, 139, 250, 0.1);
-}
-
-.bg-accent-blue\/10 {
-  background-color: rgba(96, 165, 250, 0.1);
-}
-
-.from-accent-fuchsia\/5 {
-  --tw-gradient-from: rgba(232, 121, 249, 0.05) var(--tw-gradient-from-position);
-}
-
-.to-accent-blue\/5 {
-  --tw-gradient-to: rgba(96, 165, 250, 0.05) var(--tw-gradient-to-position);
-}
-
-/* Focus styles for skip link */
-.focus\:bg-accent-fuchsia:focus {
-  background-color: var(--accent-fuchsia);
-}
-
-.focus\:shadow-glow-lg:focus {
-  box-shadow: 0 0 30px -5px var(--glow-fuchsia);
 }

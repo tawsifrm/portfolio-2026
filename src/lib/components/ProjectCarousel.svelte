@@ -1,74 +1,56 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { Github, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-svelte';
-  import { projects, type Project } from '$lib/data/projects';
+  import { projects, coverGradient } from '$lib/data/projects';
 
   let carousel: HTMLDivElement;
   let viewport: HTMLDivElement;
   let track: HTMLDivElement;
   let pagination: HTMLDivElement;
-  let progressBar: HTMLDivElement;
 
   let state = $state({
     index: 0,
     pos: 0,
     width: 0,
     height: 0,
-    gap: 28,
+    gap: 30,
     dragging: false,
     pointerId: null as number | null,
     x0: 0,
+    startPos: 0,
     v: 0,
-    t0: 0,
+    xLast: 0,
+    tLast: 0,
     animating: false,
-    hovering: false,
-    startTime: 0,
-    pausedAt: 0,
-    rafId: 0,
     animationRafId: 0
   });
 
   let opts = {
-    gap: 28,
-    peek: 0.15,
-    rotateY: 34,
-    zDepth: 150,
-    scaleDrop: 0.09,
-    blurMax: 2.0,
-    activeLeftBias: 0.12,
-    interval: 6000,
-    transitionMs: 900,
+    gap: 30,
+    peek: 0.19,
+    rotateY: 30,
+    zDepth: 130,
+    scaleDrop: 0.1,
+    blurMax: 1.6,
+    activeLeftBias: 0, // 0 = active card centered (peeks of both neighbours)
+    transitionMs: 520,
     breakpoints: [
-      { mq: '(max-width: 1200px)', gap: 24, peek: 0.12, rotateY: 28, zDepth: 120, scaleDrop: 0.08, activeLeftBias: 0.1 },
-      { mq: '(max-width: 1000px)', gap: 18, peek: 0.09, rotateY: 22, zDepth: 90, scaleDrop: 0.07, activeLeftBias: 0.09 },
-      { mq: '(max-width: 768px)', gap: 14, peek: 0.06, rotateY: 16, zDepth: 70, scaleDrop: 0.06, activeLeftBias: 0.08 },
-      { mq: '(max-width: 560px)', gap: 12, peek: 0.05, rotateY: 12, zDepth: 60, scaleDrop: 0.05, activeLeftBias: 0.07 }
+      { mq: '(max-width: 1120px)', gap: 24, peek: 0.16, rotateY: 26, zDepth: 110, scaleDrop: 0.09 }
     ]
   };
 
-  let slideW = 880;
-  let tiltX = 0;
-  let tiltY = 0;
+  let slideW = 640;
   let isFF = false;
   let ro: ResizeObserver;
   let mediaQueries: { mq: MediaQueryList; handler: () => void }[] = [];
 
   const n = projects.length;
 
-  // Generate unique gradient backgrounds for each project
-  const gradientBackgrounds = [
-    'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    'linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #415a77 100%)',
-    'linear-gradient(135deg, #10002b 0%, #240046 50%, #3c096c 100%)',
-    'linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a506b 100%)',
-    'linear-gradient(135deg, #1a1423 0%, #2d1b36 50%, #402749 100%)',
-    'linear-gradient(135deg, #0d1321 0%, #1d2d44 50%, #3e5c76 100%)'
-  ];
-
   function mod(i: number, n: number): number {
     return ((i % n) + n) % n;
   }
 
+  // Shortest wrapped target so the carousel always loops the short way round.
   function nearest(from: number, target: number): number {
     let d = target - Math.round(from);
     if (d > n / 2) d -= n;
@@ -78,27 +60,30 @@
 
   function measure() {
     if (!viewport || !carousel || !pagination) return;
-    
+
     const viewRect = viewport.getBoundingClientRect();
     const rootRect = carousel.getBoundingClientRect();
     const pagRect = pagination.getBoundingClientRect();
     const bottomGap = Math.max(12, Math.round(rootRect.bottom - pagRect.bottom));
     const pagSpace = pagRect.height + bottomGap;
     const availH = viewRect.height - pagSpace;
-    const cardH = Math.max(320, Math.min(640, Math.round(availH)));
-    
+    const cardH = Math.max(360, Math.min(640, Math.round(availH)));
+
     state.width = viewRect.width;
     state.height = viewRect.height;
     state.gap = opts.gap;
-    slideW = Math.min(880, state.width * (1 - opts.peek * 2));
-    
+    // JS owns the slide width so transform math matches the rendered card width.
+    // Narrower than the stage so a peek of both neighbours shows.
+    slideW = Math.min(720, Math.round(state.width * (1 - opts.peek * 2)));
+
+    carousel.style.setProperty('--mzaC-slideW', `${slideW}px`);
     carousel.style.setProperty('--mzaPagH', `${pagSpace}px`);
     carousel.style.setProperty('--mzaCardH', `${cardH}px`);
   }
 
   function render(markActive = false) {
     if (!track) return;
-    
+
     const slides = track.querySelectorAll('.mzaCarousel-slide');
     const span = slideW + state.gap;
 
@@ -106,7 +91,7 @@
       let d = i - state.pos;
       if (d > n / 2) d -= n;
       if (d < -n / 2) d += n;
-      
+
       const weight = Math.max(0, 1 - Math.abs(d) * 2);
       const biasActive = -slideW * opts.activeLeftBias * weight;
       const tx = d * span + biasActive;
@@ -127,66 +112,28 @@
         s.style.filter = `blur(${blur}px)`;
       }
       s.style.zIndex = String(z);
-      
+
       if (markActive) {
         s.dataset.state = Math.round(state.index) === i ? 'active' : 'rest';
       }
-
-      const card = s.querySelector('.mzaCard') as HTMLElement;
-      if (card) {
-        const parBase = Math.max(-1, Math.min(1, -d));
-        const parX = parBase * 48 + tiltY * 2.0;
-        const parY = tiltX * -1.5;
-        const bgX = parBase * -64 + tiltY * -2.4;
-        
-        card.style.setProperty('--mzaParX', `${parX.toFixed(2)}px`);
-        card.style.setProperty('--mzaParY', `${parY.toFixed(2)}px`);
-        card.style.setProperty('--mzaParBgX', `${bgX.toFixed(2)}px`);
-        card.style.setProperty('--mzaParBgY', `${(parY * 0.35).toFixed(2)}px`);
-      }
     }
-  }
-
-  function renderProgress(p: number) {
-    if (progressBar) {
-      progressBar.style.transform = `scaleX(${p})`;
-    }
-  }
-
-  function startCycle() {
-    state.startTime = performance.now();
-    renderProgress(0);
-  }
-
-  function loop() {
-    const step = (t: number) => {
-      if (!state.dragging && !state.hovering && !state.animating) {
-        const elapsed = t - state.startTime;
-        const p = Math.min(1, elapsed / opts.interval);
-        renderProgress(p);
-        if (elapsed >= opts.interval) next();
-      }
-      state.rafId = requestAnimationFrame(step);
-    };
-    state.rafId = requestAnimationFrame(step);
   }
 
   function goTo(i: number, animate = true) {
-    // Cancel any ongoing animation
     if (state.animationRafId) {
       cancelAnimationFrame(state.animationRafId);
       state.animationRafId = 0;
     }
-    
+
     const start = state.pos;
     const end = nearest(start, i);
     const dur = animate ? opts.transitionMs : 0;
     const t0 = performance.now();
-    const ease = (x: number) => 1 - Math.pow(1 - x, 4);
-    
+    const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+
     state.animating = true;
-    state.index = mod(i, n); // Update index immediately for instant dot update
-    
+    state.index = mod(i, n); // update index immediately so the dots track instantly
+
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / dur);
       const p = dur ? ease(t) : 1;
@@ -196,18 +143,17 @@
         state.animationRafId = requestAnimationFrame(step);
       } else {
         state.animationRafId = 0;
-        afterSnap(i);
+        afterSnap();
       }
     };
     state.animationRafId = requestAnimationFrame(step);
   }
 
-  function afterSnap(i: number) {
+  function afterSnap() {
     state.index = mod(Math.round(state.pos), n);
     state.pos = state.index;
     state.animating = false;
     render(true);
-    startCycle();
   }
 
   function prev() {
@@ -218,62 +164,66 @@
     goTo(mod(state.index + 1, n));
   }
 
-  function onTilt(e: PointerEvent) {
-    if (!viewport) return;
-    const r = viewport.getBoundingClientRect();
-    const mx = (e.clientX - r.left) / r.width - 0.5;
-    const my = (e.clientY - r.top) / r.height - 0.5;
-    tiltX = my * -6;
-    tiltY = mx * 6;
-  }
-
   function onDragStart(e: PointerEvent) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    
-    // Don't start drag if clicking on interactive elements
+
+    // Let clicks on links/buttons through without starting a drag.
     const target = e.target as HTMLElement;
     if (target.closest('a, button')) return;
-    
+
     e.preventDefault();
+
+    if (state.animationRafId) {
+      cancelAnimationFrame(state.animationRafId);
+      state.animationRafId = 0;
+      state.animating = false;
+    }
+
     state.dragging = true;
     state.pointerId = e.pointerId;
     viewport?.setPointerCapture(e.pointerId);
     state.x0 = e.clientX;
-    state.t0 = performance.now();
+    state.startPos = state.pos;
+    state.xLast = e.clientX;
+    state.tLast = performance.now();
     state.v = 0;
-    state.pausedAt = performance.now();
   }
 
   function onDragMove(e: PointerEvent) {
     if (!state.dragging || e.pointerId !== state.pointerId) return;
+
+    const now = performance.now();
+    const dt = Math.max(1, now - state.tLast);
+    state.v = (e.clientX - state.xLast) / dt; // instantaneous velocity (px/ms)
+    state.xLast = e.clientX;
+    state.tLast = now;
+
     const dx = e.clientX - state.x0;
-    const dt = Math.max(16, performance.now() - state.t0);
-    state.v = dx / dt;
-    const slideSpan = slideW + state.gap;
-    state.pos = mod(state.index - dx / slideSpan, n);
+    const span = slideW + state.gap;
+    state.pos = mod(state.startPos - dx / span, n);
     render();
   }
 
   function onDragEnd(e: PointerEvent | null) {
     if (!state.dragging || (e && e.pointerId !== state.pointerId)) return;
     state.dragging = false;
-    
+
     try {
-      if (state.pointerId != null) {
-        viewport?.releasePointerCapture(state.pointerId);
-      }
+      if (state.pointerId != null) viewport?.releasePointerCapture(state.pointerId);
     } catch {}
-    
+
     state.pointerId = null;
-    
-    if (state.pausedAt) {
-      state.startTime += performance.now() - state.pausedAt;
-      state.pausedAt = 0;
-    }
-    
-    const v = state.v;
-    const threshold = 0.18;
-    let target = Math.round(state.pos - Math.sign(v) * (Math.abs(v) > threshold ? 0.5 : 0));
+
+    // Project a little momentum, then snap — but never fling more than one slide
+    // past where the drag ended, so it always feels controlled.
+    const span = slideW + state.gap;
+    const velSlides = state.v / span;
+    const projected = state.pos - velSlides * 150;
+    const base = Math.round(state.pos);
+    let target = Math.round(projected);
+    if (target > base + 1) target = base + 1;
+    if (target < base - 1) target = base - 1;
+
     goTo(mod(target, n));
   }
 
@@ -282,38 +232,23 @@
     if (e.key === 'ArrowRight') next();
   }
 
-  function onMouseEnter() {
-    state.hovering = true;
-    state.pausedAt = performance.now();
-  }
-
-  function onMouseLeave() {
-    if (state.pausedAt) {
-      state.startTime += performance.now() - state.pausedAt;
-      state.pausedAt = 0;
-    }
-    state.hovering = false;
-  }
-
   onMount(() => {
     if (typeof window === 'undefined') return;
-    
+
     isFF = typeof (window as any).InstallTrigger !== 'undefined';
-    
+
     if (isFF) {
       opts.rotateY = 10;
       opts.zDepth = 0;
       opts.blurMax = 0;
     }
-    
-    // Setup ResizeObserver
+
     ro = new ResizeObserver(() => {
       measure();
       render();
     });
     ro.observe(viewport);
-    
-    // Setup breakpoint listeners
+
     opts.breakpoints.forEach((bp) => {
       const mq = window.matchMedia(bp.mq);
       const handler = () => {
@@ -329,34 +264,30 @@
       mediaQueries.push({ mq, handler });
       if (mq.matches) handler();
     });
-    
+
     measure();
-    goTo(0, false);
-    startCycle();
-    loop();
+    // Paint the initial layout synchronously so there's no flash of
+    // unpositioned slides before the first animation frame.
+    state.pos = 0;
+    state.index = 0;
+    render(true);
   });
 
   onDestroy(() => {
     if (typeof window === 'undefined') return;
-    
-    if (state.rafId) {
-      cancelAnimationFrame(state.rafId);
-    }
-    
-    if (state.animationRafId) {
-      cancelAnimationFrame(state.animationRafId);
-    }
-    
-    if (ro) {
-      ro.disconnect();
-    }
-    
+
+    if (state.animationRafId) cancelAnimationFrame(state.animationRafId);
+    if (ro) ro.disconnect();
+
     mediaQueries.forEach(({ mq, handler }) => {
       mq.removeEventListener('change', handler);
     });
   });
 </script>
 
+<!-- Fully operable via the arrow buttons and pagination dots below; pointer
+     drag and arrow-key nav on the region are progressive enhancements. -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   bind:this={carousel}
   class="mzaCarousel"
@@ -364,20 +295,22 @@
   aria-roledescription="carousel"
   aria-label="Featured projects"
   onkeydown={onKeydown}
-  onmouseenter={onMouseEnter}
-  onmouseleave={onMouseLeave}
 >
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     bind:this={viewport}
     class="mzaCarousel-viewport"
     tabindex="0"
     onpointerdown={onDragStart}
-    onpointermove={(e) => { onDragMove(e); onTilt(e); }}
+    onpointermove={onDragMove}
     onpointerup={onDragEnd}
     onpointercancel={(e) => onDragEnd(e)}
   >
     <div bind:this={track} class="mzaCarousel-track">
       {#each projects as project, i}
+        {@const hasLiveLink = !!project.link && project.link !== project.github}
+        {@const cover = project.image ? `url('${project.image}'), ${coverGradient(i)}` : coverGradient(i)}
         <article
           class="mzaCarousel-slide"
           role="group"
@@ -385,36 +318,26 @@
           aria-label="{i + 1} of {projects.length}"
           data-state={i === 0 ? 'active' : 'rest'}
         >
-          <div
-            class="mzaCard"
-            style="--mzaCard-bg: {gradientBackgrounds[i % gradientBackgrounds.length]}"
-          >
-            <!-- Decorative tech pattern overlay -->
-            <div class="mzaCard-pattern"></div>
-            
-            <header class="mzaCard-head mzaPar-1">
+          <div class="mzaCard">
+            <!-- Cover: image (or gradient) with title + date overlaid -->
+            <div class="mzaCard-cover" style="--mzaCard-bg: {cover}">
+              <div class="mzaCard-glow"></div>
+              <div class="mzaCard-scrim"></div>
+              <span class="mzaCard-date">{project.date}</span>
               <h3 class="mzaCard-title">{project.title}</h3>
-              <p class="mzaCard-kicker">{project.date}</p>
-            </header>
-            
-            <!-- Bottom content area -->
-            <div class="mzaCard-bottom mzaPar-2">
-              <!-- Left side: description and tech stack -->
-              <div class="mzaCard-info">
-                <p class="mzaCard-text">
-                  {project.detail}
-                </p>
-                <div class="mzaCard-stack">
-                  {#each project.stack.slice(0, 4) as tech}
-                    <span class="mzaCard-tag">{tech}</span>
-                  {/each}
-                  {#if project.stack.length > 4}
-                    <span class="mzaCard-tag mzaCard-tag--more">+{project.stack.length - 4}</span>
-                  {/if}
-                </div>
+            </div>
+
+            <!-- Body: dark panel with description, tech and links -->
+            <div class="mzaCard-body">
+              <p class="mzaCard-text">{project.detail}</p>
+              <div class="mzaCard-stack">
+                {#each project.stack.slice(0, 4) as tech}
+                  <span class="mzaCard-tag">{tech}</span>
+                {/each}
+                {#if project.stack.length > 4}
+                  <span class="mzaCard-tag mzaCard-tag--more">+{project.stack.length - 4}</span>
+                {/if}
               </div>
-              
-              <!-- Right side: action buttons -->
               <div class="mzaCard-actions">
                 {#if project.github}
                   <a
@@ -424,11 +347,11 @@
                     class="mzaBtn mzaBtn--secondary"
                     aria-label="View GitHub repository for {project.title}"
                   >
-                    <Github class="w-5 h-5" />
+                    <Github class="w-4 h-4" />
                     <span>GitHub</span>
                   </a>
                 {/if}
-                {#if project.link}
+                {#if hasLiveLink}
                   <a
                     href={project.link}
                     target="_blank"
@@ -436,7 +359,7 @@
                     class="mzaBtn"
                     aria-label="View live project {project.title}"
                   >
-                    <ExternalLink class="w-5 h-5" />
+                    <ExternalLink class="w-4 h-4" />
                     <span>View Project</span>
                   </a>
                 {/if}
@@ -449,18 +372,10 @@
   </div>
 
   <div class="mzaCarousel-controls">
-    <button
-      class="mzaCarousel-prev"
-      onclick={prev}
-      aria-label="Previous slide"
-    >
+    <button class="mzaCarousel-prev" onclick={prev} aria-label="Previous slide">
       <ChevronLeft class="w-6 h-6" />
     </button>
-    <button
-      class="mzaCarousel-next"
-      onclick={next}
-      aria-label="Next slide"
-    >
+    <button class="mzaCarousel-next" onclick={next} aria-label="Next slide">
       <ChevronRight class="w-6 h-6" />
     </button>
   </div>
@@ -480,24 +395,21 @@
 </div>
 
 <style>
-  :root {
+  .mzaCarousel {
     --mzaC-fg: #f8fafc;
     --mzaC-accent: #e879f9;
     --mzaC-accent2: #a78bfa;
-    --mzaC-glass: rgba(26, 26, 36, 0.7);
+    --mzaC-glass: rgba(20, 20, 28, 0.96);
     --mzaC-glow: rgba(232, 121, 249, 0.4);
-    --mzaC-slideW: min(820px, 88vw);
-    --mzaC-peek: 0.15;
+    --mzaC-slideW: min(640px, 82vw);
     --mzaPagH: 64px;
-    --mzaCardH: clamp(360px, 62vh, 600px);
-  }
+    --mzaCardH: clamp(380px, 62vh, 620px);
 
-  .mzaCarousel {
     position: relative;
-    height: 70vh;
-    min-height: 480px;
-    max-height: 650px;
-    max-width: 100vw;
+    height: 72vh;
+    min-height: 520px;
+    max-height: 680px;
+    max-width: 1040px;
     margin: 0 auto;
     padding: 0 18px;
     overflow: visible;
@@ -510,6 +422,11 @@
     outline: none;
     overflow: visible;
     height: 100%;
+    cursor: grab;
+  }
+
+  .mzaCarousel-viewport:active {
+    cursor: grabbing;
   }
 
   .mzaCarousel-track {
@@ -526,11 +443,9 @@
     left: 50%;
     width: var(--mzaC-slideW);
     height: min(var(--mzaCardH), calc(100% - 50px));
+    margin-left: calc(var(--mzaC-slideW) / -2);
     transform-style: preserve-3d;
-    display: grid;
-    place-items: center;
     border-radius: 22px;
-    overflow: hidden;
     will-change: transform, filter;
   }
 
@@ -540,107 +455,93 @@
     height: 100%;
     border-radius: inherit;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background: var(--mzaC-glass);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-    backdrop-filter: saturate(120%) blur(4px);
-    transform: translateZ(0);
-    cursor: grab;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .mzaCard::before {
-    content: '';
-    position: absolute;
-    inset: -2%;
-    background: var(--mzaCard-bg);
+  /* ----- Cover (top) ----- */
+  .mzaCard-cover {
+    position: relative;
+    flex: 0 0 54%;
+    min-height: 0;
+    background-image: var(--mzaCard-bg);
     background-size: cover;
     background-position: center;
-    filter: contrast(1.02) saturate(1.08) brightness(0.9);
-    transform: translateZ(-60px) scale(1.18)
-      translate3d(var(--mzaParBgX, 0px), var(--mzaParBgY, 0px), 0);
-    transition: transform 800ms cubic-bezier(0.2, 0.7, 0, 1),
-      filter 800ms cubic-bezier(0.2, 0.7, 0, 1);
   }
 
-  .mzaCard::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.35) 45%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
-  }
-
-  /* Decorative tech pattern */
-  .mzaCard-pattern {
+  .mzaCard-glow {
     position: absolute;
     inset: 0;
     z-index: 1;
-    opacity: 0.08;
-    background-image: 
-      radial-gradient(circle at 20% 80%, var(--mzaC-accent) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, var(--mzaC-accent2) 0%, transparent 40%),
-      linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.03) 49.5%, rgba(255,255,255,0.03) 50.5%, transparent 50.5%),
-      linear-gradient(0deg, transparent 49.5%, rgba(255,255,255,0.03) 49.5%, rgba(255,255,255,0.03) 50.5%, transparent 50.5%);
-    background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
     pointer-events: none;
+    background-image:
+      radial-gradient(circle at 18% 82%, rgba(232, 121, 249, 0.22) 0%, transparent 45%),
+      radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.18) 0%, transparent 45%);
   }
 
-  .mzaCard-head {
+  .mzaCard-scrim {
     position: absolute;
-    inset: 24px auto auto 24px;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 45%, rgba(0, 0, 0, 0.7) 100%);
+  }
+
+  .mzaCard-date {
+    position: absolute;
+    top: 14px;
+    right: 14px;
     z-index: 2;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   .mzaCard-title {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 14px;
+    z-index: 2;
     margin: 0;
     font-family: 'Space Grotesk', system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: 0.2px;
-    font-size: clamp(22px, 3.1vw, 36px);
-    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.6);
-    line-height: 110%;
-    cursor: text;
-    color: var(--mzaC-fg);
+    font-size: clamp(20px, 2.3vw, 30px);
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
   }
 
-  .mzaCard-kicker {
-    margin: 0.5rem 0;
-    color: var(--mzaC-accent);
-    font-size: clamp(12px, 1.7vw, 14px);
-    font-weight: 600;
-    text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.6);
-    cursor: text;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  .mzaCard-bottom {
-    position: absolute;
-    inset: auto 24px 24px 24px;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 20px;
-  }
-
-  .mzaCard-info {
+  /* ----- Body (bottom, dark panel) ----- */
+  .mzaCard-body {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex: 1;
-    min-width: 0;
+    padding: 18px 22px;
   }
 
   .mzaCard-text {
     margin: 0;
     color: #cbd5e1;
-    font-size: clamp(14px, 1.8vw, 16px);
+    font-size: clamp(13px, 1.5vw, 15px);
     line-height: 1.5;
-    cursor: text;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .mzaCard-stack {
@@ -650,7 +551,7 @@
   }
 
   .mzaCard-tag {
-    padding: 6px 12px;
+    padding: 5px 11px;
     font-size: 12px;
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     font-weight: 500;
@@ -658,11 +559,10 @@
     background: rgba(232, 121, 249, 0.1);
     border: 1px solid rgba(232, 121, 249, 0.2);
     border-radius: 20px;
-    backdrop-filter: blur(4px);
   }
 
   .mzaCard-tag--more {
-    color: #64748b;
+    color: #94a3b8;
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
   }
@@ -670,8 +570,9 @@
   .mzaCard-actions {
     display: flex;
     flex-direction: row;
-    gap: 8px;
-    flex-shrink: 0;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 2px;
     pointer-events: auto;
   }
 
@@ -682,9 +583,9 @@
     gap: 6px;
     border: none;
     border-radius: 10px;
-    padding: 8px 14px;
+    padding: 9px 16px;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     color: #0a0a0f;
     background: linear-gradient(135deg, #e879f9 0%, #a78bfa 100%);
     box-shadow: 0 4px 20px var(--mzaC-glow);
@@ -704,33 +605,35 @@
   }
 
   .mzaBtn--secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: var(--mzaC-fg);
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: none;
   }
 
   .mzaBtn--secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.14);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
 
+  /* ----- Controls ----- */
   .mzaCarousel-controls {
     position: absolute;
     inset: 0;
+    bottom: var(--mzaPagH);
     display: flex;
     align-items: center;
     justify-content: space-between;
     pointer-events: none;
-    padding: 0 8px;
+    padding: 0 4px;
   }
 
   .mzaCarousel-prev,
   .mzaCarousel-next {
     pointer-events: auto;
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(26, 26, 36, 0.8);
@@ -766,8 +669,8 @@
   }
 
   .mzaCarousel-dot {
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.2);
     border: 0;
@@ -784,163 +687,9 @@
     background: rgba(255, 255, 255, 0.35);
   }
 
-  .mzaCarousel-progress {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 0;
-    width: min(600px, 80%);
-    height: 3px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .mzaCarousel-progressBar {
-    display: block;
-    height: 100%;
-    width: 100%;
-    transform-origin: left;
-    transform: scaleX(0);
-    will-change: transform;
-    background: linear-gradient(90deg, var(--mzaC-accent), var(--mzaC-accent2));
-    border-radius: inherit;
-  }
-
-  .mzaCarousel-slide[data-state='active'] .mzaCard::before {
-    filter: contrast(1.06) saturate(1.12) brightness(1.02);
-  }
-
   .mzaCarousel-slide[data-state='active'] .mzaCard {
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55),
       0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-      0 0 80px -20px rgba(232, 121, 249, 0.2);
-  }
-
-  .mzaPar-1,
-  .mzaPar-2,
-  .mzaPar-3 {
-    will-change: transform;
-    transition: transform 500ms cubic-bezier(0.2, 0.7, 0, 1);
-  }
-
-  .mzaPar-1 {
-    transform: translate3d(
-      calc(var(--mzaParX, 0px) * 0.35),
-      calc(var(--mzaParY, 0px) * 0.35),
-      0
-    );
-  }
-
-  .mzaPar-2 {
-    transform: translate3d(
-      calc(var(--mzaParX, 0px) * 0.25),
-      calc(var(--mzaParY, 0px) * 0.25),
-      0
-    );
-  }
-
-  .mzaPar-3 {
-    transform: translate3d(
-      calc(var(--mzaParX, 0px) * 0.18),
-      calc(var(--mzaParY, 0px) * 0.18),
-      0
-    );
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 1000px) {
-    :root {
-      --mzaC-slideW: min(92vw, 620px);
-    }
-
-    .mzaCard-head {
-      inset: 20px auto auto 20px;
-    }
-
-    .mzaCard-title {
-      font-size: clamp(20px, 5.4vw, 30px);
-    }
-
-    .mzaCard-bottom {
-      inset: auto 40px 20px 20px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    :root {
-      --mzaC-slideW: min(94vw, 560px);
-    }
-
-    .mzaCarousel {
-      height: 70vh;
-      min-height: 450px;
-    }
-
-    .mzaCard-bottom {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-      inset: auto 20px 20px 20px;
-    }
-
-    .mzaCard-stack {
-      gap: 6px;
-    }
-
-    .mzaCard-tag {
-      padding: 4px 10px;
-      font-size: 11px;
-    }
-
-    .mzaBtn {
-      padding: 8px 12px;
-      font-size: 11px;
-    }
-
-    .mzaCarousel-prev,
-    .mzaCarousel-next {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
-  @media (max-width: 560px) {
-    :root {
-      --mzaC-slideW: min(96vw, 520px);
-    }
-
-    .mzaCarousel {
-      height: 65vh;
-      min-height: 400px;
-    }
-
-    .mzaCard-bottom {
-      inset: auto 16px 16px 16px;
-    }
-
-    .mzaCard-text {
-      font-size: 13px;
-    }
-
-    .mzaBtn span {
-      display: none;
-    }
-
-    .mzaBtn {
-      padding: 8px 10px;
-    }
-  }
-
-  @media (max-height: 500px) {
-    .mzaCard-text {
-      display: none;
-    }
-  }
-
-  @media (max-height: 400px) {
-    .mzaCard-stack {
-      display: none;
-    }
+      0 0 80px -20px rgba(232, 121, 249, 0.25);
   }
 </style>
