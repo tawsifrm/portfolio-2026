@@ -66,7 +66,7 @@
           class="text-base sm:text-lg text-text-secondary leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0"
           in:fly={{ y: 30, delay: 160, duration: 500, easing: quintOut }}
         >
-          Passionate about leveraging technology to solve real-world challenges and create impactful software solutions.
+          Distributed systems, cloud infrastructure, and a soft spot for anything that runs at 3am without me.
         </p>
 
         <!-- Social Links -->
