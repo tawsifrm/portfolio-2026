@@ -24,12 +24,30 @@
   const uniqueId = Math.random().toString(36).substring(2, 9);
   const clipId = `blobClip-${uniqueId}`;
   const textPathId = `textPath-${uniqueId}`;
+
+  /* The orbiting label is a SMIL <animate>, which CSS cannot reach - a
+     `prefers-reduced-motion` block in a stylesheet will not stop it. Pause the
+     SVG's own animation timeline instead, and keep listening so a change to the
+     OS setting takes effect without a reload. */
+  let svgEl = $state<SVGSVGElement | null>(null);
+
+  $effect(() => {
+    const svg = svgEl;
+    if (!svg) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => (mq.matches ? svg.pauseAnimations() : svg.unpauseAnimations());
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  });
 </script>
 
 <div class="animated-profile-container {className}">
   <svg
+    bind:this={svgEl}
     viewBox="0 0 200 200"
     xmlns="http://www.w3.org/2000/svg"
+    role="img"
     aria-label={alt}
     class="animated-profile-svg"
   >
@@ -113,7 +131,7 @@
   }
 
   .text-content {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     /* Sized so a single copy of the label is just under the path's total
        length (~520 user units), so the two tiled copies scroll seamlessly
        without overlapping. The SVG scales, so this holds at every screen
@@ -124,7 +142,7 @@
     font-weight: 700;
     letter-spacing: 1.1px;
     text-transform: uppercase;
-    fill: var(--accent-fuchsia, #e879f9);
+    fill: var(--accent-bright, #828fff);
     mix-blend-mode: normal;
     transition: fill 0.5s ease;
   }

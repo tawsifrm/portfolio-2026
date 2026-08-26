@@ -7,9 +7,6 @@ export function preloadSection(section: string) {
     case 'landing':
       import('../sections/LandingSection.svelte');
       break;
-    case 'home':
-      import('../sections/HomeSection.svelte');
-      break;
     case 'experience':
       import('../sections/ExperienceSection.svelte');
       break;

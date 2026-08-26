@@ -3,14 +3,12 @@
   import { quintOut } from 'svelte/easing';
   import { activeSection } from '../stores/sectionStore';
   import { Footer } from '../components';
-  
+
   // Dynamic imports for code splitting - sections load on demand
   const loadSection = (section: string) => {
     switch (section) {
       case 'landing':
         return import('../sections/LandingSection.svelte');
-      case 'home':
-        return import('../sections/HomeSection.svelte');
       case 'experience':
         return import('../sections/ExperienceSection.svelte');
       case 'projects':
@@ -23,27 +21,35 @@
   };
 </script>
 
-<main id="main-content" aria-label="Main content" class="min-h-screen flex flex-col">
+<main id="main-content" aria-label="Main content" class="flex min-h-screen flex-col">
   <div class="flex-grow pb-8 md:pb-12">
     {#key $activeSection}
       <div
         class="transform-gpu"
-        in:fly={{ y: 30, duration: 500, easing: quintOut }}
-        out:fade={{ duration: 300, easing: quintOut }}
+        in:fly={{ y: 16, duration: 360, easing: quintOut }}
+        out:fade={{ duration: 180 }}
       >
         {#await loadSection($activeSection)}
-          <!-- Loading skeleton while section loads -->
-          <div class="min-h-screen flex items-center justify-center">
-            <div class="flex flex-col items-center gap-4">
-              <div class="w-12 h-12 border-4 border-accent-fuchsia/30 border-t-accent-fuchsia rounded-full animate-spin"></div>
-              <p class="text-text-muted text-sm">Loading...</p>
+          <!-- Skeleton shaped like the section that is arriving, rather than a
+               generic spinner. -->
+          <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6" aria-hidden="true">
+            <div class="mb-10 h-10 w-56 rounded-lg bg-surface-1"></div>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div class="h-56 rounded-xl border border-hairline bg-surface-1"></div>
+              <div class="h-56 rounded-xl border border-hairline bg-surface-1"></div>
             </div>
           </div>
         {:then module}
-          <svelte:component this={module.default} />
-        {:catch error}
-          <div class="min-h-screen flex items-center justify-center">
-            <p class="text-red-400">Failed to load section</p>
+          {@const Section = module.default}
+          <Section />
+        {:catch}
+          <div class="flex min-h-screen items-center justify-center px-4">
+            <div class="panel max-w-md p-6 text-center">
+              <h2 class="mb-2 text-lg font-semibold text-ink">This section did not load</h2>
+              <p class="text-sm text-ink-muted">
+                Check your connection and reload the page to try again.
+              </p>
+            </div>
           </div>
         {/await}
       </div>

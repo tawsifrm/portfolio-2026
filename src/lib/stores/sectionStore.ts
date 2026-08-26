@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-export type Section = 'landing' | 'home' | 'experience' | 'projects' | 'contact';
+export type Section = 'landing' | 'experience' | 'projects' | 'contact';
 
 export const activeSection = writable<Section>('landing');
 

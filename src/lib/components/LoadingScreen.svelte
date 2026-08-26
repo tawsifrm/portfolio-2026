@@ -1,128 +1,75 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { scale } from 'svelte/transition';
   import { finishLoading } from '../stores/loadingStore';
 
-  // Loading duration in milliseconds (2.5 seconds for tasteful timing)
-  const LOADING_DURATION = 2500;
+  /* This screen used to hold the page for a hardcoded 2500ms, which put a floor
+     under LCP that no amount of bundle work could beat. It now resolves on real
+     readiness — web fonts settled — with MIN_VISIBLE so it cannot flash, and
+     MAX_WAIT so a slow font CDN can never hold the content hostage. */
+  const MIN_VISIBLE = 320;
+  const MAX_VISIBLE = 900;
 
   onMount(() => {
-    const timer = setTimeout(() => {
+    // Anyone who has asked for reduced motion gets the content immediately.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       finishLoading();
-    }, LOADING_DURATION);
+      return;
+    }
 
-    return () => clearTimeout(timer);
+    const start = performance.now();
+    let done = false;
+    const release = () => {
+      if (done) return;
+      done = true;
+      finishLoading();
+    };
+
+    const settle = () => {
+      const held = performance.now() - start;
+      timer = window.setTimeout(release, Math.max(0, MIN_VISIBLE - held));
+    };
+
+    let timer = window.setTimeout(release, MAX_VISIBLE);
+    const ready = document.fonts?.ready;
+    if (ready) {
+      ready.then(() => {
+        window.clearTimeout(timer);
+        settle();
+      });
+    }
+
+    return () => window.clearTimeout(timer);
   });
 </script>
 
 <div
-  class="fixed inset-0 min-h-screen bg-bg-primary flex items-center justify-center z-50"
+  class="fixed inset-0 z-50 flex min-h-screen flex-col items-center justify-center gap-6 bg-canvas"
   role="status"
-  aria-label="Loading portfolio"
+  aria-label="Loading…"
 >
-  <div
-    class="text-center will-change-transform transform-gpu"
-    in:scale={{ duration: 500, start: 0.85, opacity: 0 }}
-  >
-    <!-- Glow effect behind the SVG -->
-    <div class="relative">
-      <div
-        class="absolute inset-0 blur-[100px] opacity-30 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-blue-500 animate-pulse transform-gpu"
-        aria-hidden="true"
-      ></div>
-      
-      <!-- Wave-filling text animation -->
-      <svg viewBox="0 0 200 40" class="loading-svg">
-        <defs>
-          <!-- Gradient using portfolio colors -->
-          <linearGradient id="wave-gradient" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stop-color="var(--accent-fuchsia)" />
-            <stop offset="50%" stop-color="var(--accent-purple)" />
-            <stop offset="100%" stop-color="var(--accent-blue)" />
-          </linearGradient>
-          
-          <!-- Wave pattern -->
-          <pattern
-            id="wave"
-            x="0"
-            y="0"
-            width="120"
-            height="40"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              id="wavePath"
-              d="M-40 24 Q-30 20 -20 24 T0 24 T20 24 T40 24 T60 24 T80 24 T100 24 T120 24 V40 H-40z"
-              fill="url(#wave-gradient)"
-            >
-              <animateTransform
-                attributeName="transform"
-                begin="0s"
-                dur="1.5s"
-                type="translate"
-                from="0,0"
-                to="40,0"
-                repeatCount="indefinite"
-              />
-            </path>
-          </pattern>
-        </defs>
-        
-        <!-- Main animated text with wave fill -->
-        <text
-          text-anchor="middle"
-          x="100"
-          y="30"
-          font-size="24"
-          font-weight="bold"
-          fill="url(#wave)"
-          fill-opacity="0.9"
-          class="loading-text"
-        >
-          Tawsif Mayaz
-        </text>
-        
-        <!-- Background text for depth -->
-        <text
-          text-anchor="middle"
-          x="100"
-          y="30"
-          font-size="24"
-          font-weight="bold"
-          fill="url(#wave-gradient)"
-          fill-opacity="0.15"
-          class="loading-text"
-        >
-          Tawsif Mayaz
-        </text>
-      </svg>
-    </div>
+  <p class="text-2xl font-semibold tracking-[-0.03em] text-ink">Tawsif Mayaz</p>
+
+  <!-- Hairline track with an accent sweep. One accent, no glow, no gradient. -->
+  <div class="h-px w-40 overflow-hidden bg-hairline" aria-hidden="true">
+    <div class="sweep h-full w-full bg-accent-bright"></div>
   </div>
 </div>
 
 <style>
-  .loading-svg {
-    max-width: 700px;
-    width: 90vw;
-    height: auto;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+  .sweep {
+    transform-origin: left center;
+    animation: sweep 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .loading-text {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    letter-spacing: 0.1em;
+  @keyframes sweep {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
   }
 
-  /* Responsive sizing */
-  @media (min-width: 768px) {
-    .loading-svg {
-      max-width: 800px;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .loading-svg {
-      max-width: 900px;
+  @media (prefers-reduced-motion: reduce) {
+    .sweep {
+      animation: none;
+      transform: scaleX(1);
     }
   }
 </style>

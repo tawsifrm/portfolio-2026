@@ -11,16 +11,17 @@ export interface Project {
   image?: string;
 }
 
-/** On-brand cover gradients (fuchsia / purple / blue), dark enough for white
- *  text. Shared by the desktop carousel and the mobile project cards so a
- *  given project always gets the same cover. */
+/** Cover gradients for projects without a screenshot. Neutral charcoal steps
+ *  that lean faintly toward the single lavender accent, dark enough for white
+ *  text. Shared by the desktop carousel and the mobile project cards so a given
+ *  project always gets the same cover. */
 export const coverGradients = [
-  'linear-gradient(135deg, #1b0f2e 0%, #2a1745 50%, #3a1d5c 100%)',
-  'linear-gradient(135deg, #0e1430 0%, #172554 50%, #1e3a8a 100%)',
-  'linear-gradient(135deg, #2a0f2e 0%, #431447 50%, #5b1d5c 100%)',
-  'linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #2c3e5a 100%)',
-  'linear-gradient(135deg, #1a1423 0%, #2d1b36 50%, #402749 100%)',
-  'linear-gradient(135deg, #10002b 0%, #240046 50%, #3c096c 100%)'
+  'linear-gradient(135deg, #0f1011 0%, #16171c 50%, #1e2029 100%)',
+  'linear-gradient(135deg, #0d0e12 0%, #14161d 50%, #1b1e2b 100%)',
+  'linear-gradient(135deg, #101114 0%, #181a21 50%, #222533 100%)',
+  'linear-gradient(135deg, #0e0f11 0%, #15161a 50%, #1d1f27 100%)',
+  'linear-gradient(135deg, #0f1013 0%, #17181f 50%, #20222d 100%)',
+  'linear-gradient(135deg, #0c0d10 0%, #13151b 50%, #1a1d29 100%)'
 ];
 
 export function coverGradient(index: number): string {
@@ -32,7 +33,7 @@ export const projects: Project[] = [
     title: "Sibyl",
     stack: ["React", "FastAPI", "PostgreSQL", "pgvector", "SSE"],
     date: "Mar 2026",
-    detail: "1st place & Best Use of AI/ML at Hack for Humanity — an AI auditor that fact-checks corporate sustainability reports against satellite, legal, news, and academic evidence.",
+    detail: "1st place and Best Use of AI/ML at Hack for Humanity. An AI auditor that fact-checks corporate sustainability reports against satellite, legal, news, and academic evidence.",
     link: "https://devpost.com/software/sibyl-x8gpor",
     github: "https://github.com/HackForHumanity2026/Sibyl",
     image: "/images/projects/sibyl.png"

@@ -1,24 +1,21 @@
 <script lang="ts">
   import './app.css';
   import { fade } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
   import { isLoading } from './lib/stores/loadingStore';
-  import { LoadingScreen, Navbar, Main, SkipLink, AnimatedBackground } from './lib/components';
+  import { LoadingScreen, Navbar, Main, SkipLink } from './lib/components';
 </script>
 
 <SkipLink />
-<AnimatedBackground />
 
-<div class="min-h-screen bg-bg-primary text-text-primary">
+<div class="min-h-screen bg-canvas text-ink">
   {#if $isLoading}
-    <div class="transform-gpu" transition:fade={{ duration: 350, easing: quintOut }}>
+    <div transition:fade={{ duration: 200 }}>
       <LoadingScreen />
     </div>
   {:else}
-    <div class="transform-gpu" transition:fade={{ duration: 350, delay: 150, easing: quintOut }}>
+    <div transition:fade={{ duration: 200 }}>
       <Navbar />
       <Main />
     </div>
   {/if}
 </div>
-

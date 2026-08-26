@@ -2,14 +2,10 @@
   // Minimal footer component
 </script>
 
-<footer class="bg-bg-secondary border-t border-border-subtle py-4 sm:py-6">
+<footer class="border-t border-hairline py-6">
   <div class="container mx-auto px-4 sm:px-6">
-    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-      <p class="text-text-muted text-xs sm:text-sm">
-        <span class="hover:text-accent-fuchsia transition-colors duration-200 cursor-default">
-          Made with ❤️ by Tawsif
-        </span>
-      </p>
-    </div>
+    <p class="text-center text-sm text-ink-subtle">
+      Built and maintained by Tawsif Mayaz
+    </p>
   </div>
 </footer>

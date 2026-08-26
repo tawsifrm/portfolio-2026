@@ -9,7 +9,6 @@
     icon: typeof Github;
     label: string;
     href: string;
-    color: string;
   }
 
   interface NavLink {
@@ -19,10 +18,10 @@
   }
 
   const socialLinks: SocialLink[] = [
-    { icon: Github, label: 'GitHub', href: 'https://github.com/tawsifrm', color: 'hover:text-white hover:bg-[#333]' },
-    { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/tawsif-mayaz/', color: 'hover:text-white hover:bg-[#0077b5]' },
-    { icon: Mail, label: 'Email', href: 'mailto:tawsifmayaz@gmail.com', color: 'hover:text-white hover:bg-accent-fuchsia' },
-    { icon: FileText, label: 'Resume', href: '/Resume-public/Tawsif_Resume.pdf', color: 'hover:text-white hover:bg-accent-purple' },
+    { icon: Github, label: 'GitHub', href: 'https://github.com/tawsifrm' },
+    { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/tawsif-mayaz/' },
+    { icon: Mail, label: 'Email', href: 'mailto:tawsifmayaz@gmail.com' },
+    { icon: FileText, label: 'Resume', href: '/Resume-public/Tawsif_Resume.pdf' },
   ];
 
   const sectionLinks: NavLink[] = [
@@ -36,91 +35,82 @@
   }
 </script>
 
-<section class="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 xl:px-24 py-4 relative w-full">
-  <div class="max-w-7xl mx-auto w-full">
-    <!-- Main Content Grid: Text Left, Image Right -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-      
-      <!-- Left Column: Text Content -->
-      <div class="text-center lg:text-left order-2 lg:order-1">
-        <!-- Name Heading -->
+<section class="relative flex min-h-[100dvh] w-full items-center justify-center px-4 py-12 sm:px-8 lg:px-16 xl:px-24">
+  <div class="mx-auto w-full max-w-7xl">
+    <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
+
+      <!-- Left: text -->
+      <div class="order-2 text-center lg:order-1 lg:text-left">
         <h1
-          class="text-5xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl font-display font-bold mb-2"
-          in:fly={{ y: 30, delay: 0, duration: 500, easing: quintOut }}
+          class="mb-3 text-5xl font-semibold tracking-[-0.035em] text-ink sm:text-6xl lg:text-6xl xl:text-7xl"
+          in:fly={{ y: 16, duration: 400, easing: quintOut }}
         >
-          <span class="text-gradient">Tawsif</span>
-          <br />
-          <span class="text-text-primary">Mayaz</span>
+          Tawsif Mayaz
         </h1>
 
-        <!-- Subtitle/Title -->
         <p
-          class="text-lg sm:text-xl md:text-2xl text-text-secondary mb-6"
-          in:fly={{ y: 30, delay: 80, duration: 500, easing: quintOut }}
+          class="mb-5 text-lg text-ink-muted sm:text-xl"
+          in:fly={{ y: 16, delay: 60, duration: 400, easing: quintOut }}
         >
-          Computer Engineering @ <span class="text-accent-purple font-medium">UWaterloo</span>
+          Computer Engineering at <span class="text-accent-bright">UWaterloo</span>
         </p>
 
-        <!-- Introduction Content -->
         <p
-          class="text-base sm:text-lg text-text-secondary leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0"
-          in:fly={{ y: 30, delay: 160, duration: 500, easing: quintOut }}
+          class="mx-auto mb-8 max-w-xl text-base leading-relaxed text-ink-subtle lg:mx-0"
+          in:fly={{ y: 16, delay: 120, duration: 400, easing: quintOut }}
         >
-          Distributed systems, cloud infrastructure, and a soft spot for anything that runs at 3am without me.
+          Distributed systems, cloud infrastructure, and a soft spot for anything that runs at 3am
+          without me.
         </p>
 
-        <!-- Social Links -->
+        <!-- Socials -->
         <div
-          class="flex items-center justify-center lg:justify-start gap-3 mb-8"
-          in:fly={{ y: 30, delay: 240, duration: 500, easing: quintOut }}
+          class="mb-6 flex items-center justify-center gap-2 lg:justify-start"
+          in:fly={{ y: 16, delay: 180, duration: 400, easing: quintOut }}
         >
           {#each socialLinks as link}
             <a
               href={link.href}
               target={link.href.startsWith('mailto') ? undefined : '_blank'}
               rel={link.href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
-              class="group relative flex items-center justify-center w-12 h-12 rounded-xl bg-bg-tertiary border border-glass-border text-text-secondary transition-all duration-300 {link.color} hover:scale-110 hover:shadow-lg"
+              class="flex h-11 w-11 items-center justify-center rounded-lg border border-hairline text-ink-subtle transition-colors hover:border-hairline-strong hover:bg-surface-1 hover:text-ink touch-manipulation"
               aria-label={link.label}
             >
-              <link.icon size={22} />
+              <link.icon size={19} aria-hidden="true" />
             </a>
           {/each}
         </div>
 
-        <!-- Section Navigation -->
+        <!-- Section navigation -->
         <div
-          class="flex flex-wrap items-center justify-center lg:justify-start gap-3"
-          in:fly={{ y: 30, delay: 320, duration: 500, easing: quintOut }}
+          class="flex flex-wrap items-center justify-center gap-2 lg:justify-start"
+          in:fly={{ y: 16, delay: 240, duration: 400, easing: quintOut }}
         >
           {#each sectionLinks as link}
             <button
               onclick={() => handleSectionClick(link.section)}
-              class="group flex items-center gap-2 px-5 py-3 rounded-xl bg-bg-secondary border border-glass-border text-text-secondary transition-all duration-300 hover:border-accent-fuchsia/50 hover:text-accent-fuchsia hover:bg-accent-fuchsia/5 hover:scale-105 active:scale-95"
+              class="inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-hairline bg-surface-1 px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-hairline-strong hover:bg-surface-2 hover:text-ink touch-manipulation"
             >
-              <link.icon size={18} class="transition-transform group-hover:scale-110" />
-              <span class="font-medium">{link.label}</span>
+              <link.icon size={16} aria-hidden="true" />
+              {link.label}
             </button>
           {/each}
         </div>
       </div>
 
-      <!-- Right Column: Animated Profile Image -->
+      <!-- Right: portrait -->
       <div
-        class="flex justify-center lg:justify-end order-1 lg:order-2"
-        in:fade={{ delay: 0, duration: 600 }}
+        class="order-1 flex justify-center lg:order-2 lg:justify-end"
+        in:fade={{ duration: 450 }}
       >
-        <div class="relative">
-          <!-- Decorative ring -->
-          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-accent-fuchsia via-accent-purple to-accent-blue opacity-20 blur-xl scale-110 animate-pulse"></div>
-          <div class="w-80 h-80 sm:w-96 sm:h-96 md:w-[450px] md:h-[450px] lg:w-[520px] lg:h-[520px] xl:w-[600px] xl:h-[600px] relative">
-            <AnimatedProfileImage 
-              src="/images/new-pfp-lg.webp"
-              srcSm="/images/new-pfp-sm.webp"
-              srcMd="/images/new-pfp-md.webp"
-              srcLg="/images/new-pfp-lg.webp"
-              alt="Tawsif Mayaz - Computer Engineering Student"
-            />
-          </div>
+        <div class="relative h-72 w-72 sm:h-96 sm:w-96 md:h-[420px] md:w-[420px] lg:h-[480px] lg:w-[480px]">
+          <AnimatedProfileImage
+            src="/images/new-pfp-lg.webp"
+            srcSm="/images/new-pfp-sm.webp"
+            srcMd="/images/new-pfp-md.webp"
+            srcLg="/images/new-pfp-lg.webp"
+            alt="Tawsif Mayaz"
+          />
         </div>
       </div>
 

@@ -32,27 +32,27 @@
 
 <svelte:window bind:innerWidth={windowWidth} />
 
-<section class="py-8 sm:py-12 md:py-16">
-  <!-- Section heading -->
-  <div class="text-center mb-0 md:mb-2 px-4">
-    <h2
-      class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gradient pb-2"
-      in:fly={{ y: 20, duration: 400, easing: quintOut }}
+<section class="py-12 md:py-16">
+  <!-- This view is the page, so its heading is the page's h1. -->
+  <div class="mx-auto mb-8 w-full max-w-7xl px-4 sm:px-6 md:mb-10">
+    <h1
+      class="text-3xl font-semibold tracking-[-0.03em] text-ink sm:text-4xl md:text-5xl"
+      in:fly={{ y: 12, duration: 360, easing: quintOut }}
     >
       Projects
-    </h2>
+    </h1>
   </div>
 
   <!-- Desktop: Project carousel -->
   {#if isDesktop}
-    <div in:fly={{ y: 30, delay: 200, duration: 500, easing: quintOut }}>
+    <div in:fly={{ y: 12, delay: 120, duration: 360, easing: quintOut }}>
       <ProjectCarousel />
     </div>
   {:else}
     <!-- Mobile/Tablet: Project card grid -->
     <div
-      class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-4 sm:px-6 max-w-5xl mx-auto w-full"
-      in:fly={{ y: 30, delay: 200, duration: 500, easing: quintOut }}
+      class="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 px-4 sm:grid-cols-2 sm:px-6"
+      in:fly={{ y: 12, delay: 120, duration: 360, easing: quintOut }}
     >
       {#each projects as project, index (project.title)}
         <ProjectCard {project} {index} />

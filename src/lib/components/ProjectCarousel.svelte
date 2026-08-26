@@ -321,10 +321,9 @@
           <div class="mzaCard">
             <!-- Cover: image (or gradient) with title + date overlaid -->
             <div class="mzaCard-cover" style="--mzaCard-bg: {cover}">
-              <div class="mzaCard-glow"></div>
               <div class="mzaCard-scrim"></div>
               <span class="mzaCard-date">{project.date}</span>
-              <h3 class="mzaCard-title">{project.title}</h3>
+              <h2 class="mzaCard-title">{project.title}</h2>
             </div>
 
             <!-- Body: dark panel with description, tech and links -->
@@ -396,11 +395,14 @@
 
 <style>
   .mzaCarousel {
-    --mzaC-fg: #f8fafc;
-    --mzaC-accent: #e879f9;
-    --mzaC-accent2: #a78bfa;
-    --mzaC-glass: rgba(20, 20, 28, 0.96);
-    --mzaC-glow: rgba(232, 121, 249, 0.4);
+    --mzaC-fg: #f7f8f8;
+    --mzaC-ink-subtle: #8a8f98;
+    --mzaC-accent: #828fff;
+    --mzaC-accent-fill: #5e6ad2;
+    --mzaC-surface: #0f1011;
+    --mzaC-surface-2: #141516;
+    --mzaC-hairline: #23252a;
+    --mzaC-hairline-strong: #34343a;
     --mzaC-slideW: min(640px, 82vw);
     --mzaPagH: 64px;
     --mzaCardH: clamp(380px, 62vh, 620px);
@@ -445,7 +447,7 @@
     height: min(var(--mzaCardH), calc(100% - 50px));
     margin-left: calc(var(--mzaC-slideW) / -2);
     transform-style: preserve-3d;
-    border-radius: 22px;
+    border-radius: 12px;
     will-change: transform, filter;
   }
 
@@ -457,9 +459,9 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: var(--mzaC-glass);
+    background: var(--mzaC-surface);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--mzaC-hairline);
   }
 
   /* ----- Cover (top) ----- */
@@ -470,16 +472,6 @@
     background-image: var(--mzaCard-bg);
     background-size: cover;
     background-position: center;
-  }
-
-  .mzaCard-glow {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle at 18% 82%, rgba(232, 121, 249, 0.22) 0%, transparent 45%),
-      radial-gradient(circle at 82% 18%, rgba(96, 165, 250, 0.18) 0%, transparent 45%);
   }
 
   .mzaCard-scrim {
@@ -513,9 +505,9 @@
     bottom: 14px;
     z-index: 2;
     margin: 0;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.2px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     font-size: clamp(20px, 2.3vw, 30px);
     line-height: 1.1;
     color: #fff;
@@ -555,16 +547,16 @@
     font-size: 12px;
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     font-weight: 500;
-    color: var(--mzaC-accent);
-    background: rgba(232, 121, 249, 0.1);
-    border: 1px solid rgba(232, 121, 249, 0.2);
-    border-radius: 20px;
+    color: var(--mzaC-ink-subtle);
+    background: var(--mzaC-surface-2);
+    border: 1px solid var(--mzaC-hairline);
+    border-radius: 999px;
   }
 
   .mzaCard-tag--more {
-    color: #94a3b8;
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    color: #8a8f98;
+    background: transparent;
+    border-color: transparent;
   }
 
   .mzaCard-actions {
@@ -582,38 +574,36 @@
     align-items: center;
     gap: 6px;
     border: none;
-    border-radius: 10px;
+    min-height: 36px;
+    border-radius: 8px;
     padding: 9px 16px;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 13px;
-    color: #0a0a0f;
-    background: linear-gradient(135deg, #e879f9 0%, #a78bfa 100%);
-    box-shadow: 0 4px 20px var(--mzaC-glow);
+    color: #ffffff;
+    background: var(--mzaC-accent-fill);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease;
     text-decoration: none;
   }
 
   .mzaBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px var(--mzaC-glow);
+    background: var(--mzaC-accent);
   }
 
   .mzaBtn:active {
-    transform: translateY(0px);
-    box-shadow: 0 3px 15px rgba(232, 121, 249, 0.25);
+    background: #4d58b8;
   }
 
   .mzaBtn--secondary {
-    background: rgba(255, 255, 255, 0.08);
+    background: transparent;
     color: var(--mzaC-fg);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--mzaC-hairline);
     box-shadow: none;
   }
 
   .mzaBtn--secondary:hover {
-    background: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: var(--mzaC-surface-2);
+    border-color: var(--mzaC-hairline-strong);
   }
 
   /* ----- Controls ----- */
@@ -634,10 +624,9 @@
     position: relative;
     width: 46px;
     height: 46px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(26, 26, 36, 0.8);
-    backdrop-filter: blur(8px);
+    border-radius: 999px;
+    border: 1px solid var(--mzaC-hairline);
+    background: var(--mzaC-surface);
     color: var(--mzaC-fg);
     display: grid;
     place-items: center;
@@ -647,8 +636,8 @@
 
   .mzaCarousel-prev:hover,
   .mzaCarousel-next:hover {
-    background: rgba(232, 121, 249, 0.15);
-    border-color: rgba(232, 121, 249, 0.3);
+    background: var(--mzaC-surface-2);
+    border-color: var(--mzaC-hairline-strong);
   }
 
   .mzaCarousel-prev:active,
@@ -669,27 +658,39 @@
   }
 
   .mzaCarousel-dot {
-    width: 11px;
-    height: 11px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.2);
+    background: transparent;
     border: 0;
     cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  /* The visible dot is the pseudo-element; the button itself is the 26px
+     target, so the mark stays small without shrinking the hit area. */
+  .mzaCarousel-dot::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
     transition: transform 0.2s ease, background 0.2s ease;
   }
 
-  .mzaCarousel-dot[aria-selected='true'] {
-    background: linear-gradient(135deg, var(--mzaC-accent), var(--mzaC-accent2));
-    transform: scale(1.35);
+  .mzaCarousel-dot[aria-selected='true']::after {
+    background: var(--mzaC-accent);
+    transform: scale(1.3);
   }
 
-  .mzaCarousel-dot:hover:not([aria-selected='true']) {
-    background: rgba(255, 255, 255, 0.35);
+  .mzaCarousel-dot:hover:not([aria-selected='true'])::after {
+    background: rgba(255, 255, 255, 0.4);
   }
 
   .mzaCarousel-slide[data-state='active'] .mzaCard {
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-      0 0 80px -20px rgba(232, 121, 249, 0.25);
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   }
 </style>

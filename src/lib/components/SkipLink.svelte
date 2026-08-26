@@ -5,7 +5,7 @@
 
 <a
   href="#main-content"
-  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-accent-fuchsia focus:text-white focus:rounded-lg focus:shadow-glow-lg focus:outline-none"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:rounded-lg focus:bg-accent focus:text-white focus:outline-none"
 >
   Skip to main content
 </a>

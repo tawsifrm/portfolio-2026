@@ -18,7 +18,7 @@ export const experiences: Experience[] = [
     location: "Toronto, ON",
     stack: ["Java", "Spring", "REST", "Auth0", "Message Queue"],
     details: [
-      "Delivered a Java/Spring API returning any record's state as of a past date, refactoring to hexagonal architecture that moved 150+ lines of persistence logic into adapters.",
+      "Delivered a Java/Spring API returning any record’s state as of a past date, refactoring to hexagonal architecture that moved 150+ lines of persistence logic into adapters.",
       "Migrated a downstream service onto a new internal API, implementing 8 REST integrations behind one interface and securing service-to-service calls with scoped Auth0 grants.",
       "Designed end-to-end test automation spanning a TCP listener, message queue, and REST API across 12+ scenarios, replacing a shared consumer with per-request queues to eliminate flaky failures."
     ],
